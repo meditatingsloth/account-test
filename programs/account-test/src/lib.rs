@@ -13,10 +13,6 @@ pub mod account_test {
     }
 
     pub fn update<'info>(ctx: Context<'_, '_, '_, 'info, Update<'info>>) -> Result<()> {
-        // This works
-        // ctx.accounts.my_account.flag = true;
-
-        // This doesn't work
         let my_account =
             &mut Account::<'info, MyAccount>::try_from(&ctx.accounts.my_account.to_account_info())?;
         my_account.flag = true;
@@ -53,8 +49,13 @@ pub struct Update<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
-    #[account(mut, seeds = [b"my_account".as_ref()], bump = my_account.bump)]
-    pub my_account: Box<Account<'info, MyAccount>>,
+    // This doesn't work
+    // #[account(mut, seeds = [b"my_account".as_ref()], bump = my_account.bump)]
+    // pub my_account: Box<Account<'info, MyAccount>>,
+
+    /// CHECK: This works
+    #[account(mut, seeds = [b"my_account".as_ref()], bump)]
+    pub my_account: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
 }
